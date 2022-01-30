@@ -18,4 +18,4 @@ def current_timestamp():
 
 @pytest.fixture
 def api_url():
-    return 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
+    return "https://practicum.yandex.ru/api/user_api/homework_statuses/"
