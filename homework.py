@@ -20,6 +20,9 @@ logging.basicConfig(
     format="%(asctime)s, %(levelname)s, %(message)s, %(name)s",
 )
 logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(handler)
+
 
 PRACTICUM_TOKEN = os.getenv("practikum_token", "")
 TELEGRAM_TOKEN = os.getenv("telegram_token", "")
@@ -105,7 +108,7 @@ def check_response(response: Dict) -> List:
     """
     try:
         homeworks = response["homeworks"]
-        # response["current_date"]
+        response["current_date"]
     except KeyError as e:
         logger.error(e)
         raise e
@@ -194,7 +197,7 @@ def main():
             for hw in homeworks:
                 message = parse_status(hw)
                 send_message(bot, message)
-            current_timestamp = int(response["current_date"])
+            current_timestamp = response.get("current_date", current_timestamp)
             time.sleep(RETRY_TIME)
 
         except Exception as error:
