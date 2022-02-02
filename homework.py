@@ -36,6 +36,15 @@ HOMEWORK_STATUSES = {
 }
 
 
+class TelegramBotHandler(logging.Handler):
+    def __init__(self, bot: telegram.Bot):
+        super().__init__()
+        self.bot = bot
+
+    def emit(self, record: logging.LogRecord):
+        send_message(self.bot, self.format(record))
+
+
 def send_message(bot: telegram.Bot, message: str):
     """Отправляет сообщение в Telegram чат.
 
