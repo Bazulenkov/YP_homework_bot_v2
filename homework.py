@@ -73,13 +73,20 @@ def get_api_answer(current_timestamp: int = 0) -> Dict:
 
     try:
         response = requests.get(url=ENDPOINT, params=params, headers=HEADERS)
-    except ConnectionError as error:
-        logger.error(error)
-        raise error
+    except ConnectionError as e:
+        logger.error(e)
+        raise e
 
     if response.status_code != requests.codes.ok:
         response.raise_for_status()
-    return response.json()
+
+    try:
+        result = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        logger.error(e)
+        raise e
+
+    return result
 
 
 def check_response(response: Dict) -> List:
@@ -98,10 +105,16 @@ def check_response(response: Dict) -> List:
     """
     try:
         homeworks = response["homeworks"]
-        response["current_date"]
+        # response["current_date"]
     except KeyError as e:
         logger.error(e)
         raise e
+    except TypeError as e:
+        logger.error("Ответ от API пришел не в виде словаря.")
+        raise e
+
+    homeworks = response["homeworks"]
+
     if not isinstance(homeworks, list):
         raise TypeError
     if homeworks == []:
@@ -126,8 +139,12 @@ def parse_status(homework: Dict[str, str]) -> str:
     if isinstance(homework, list):
         homework = homework[0]  # type: ignore
 
-    homework_name = homework.get("homework_name")
-    homework_status = homework.get("status", "")
+    try:
+        homework_name = homework["homework_name"]
+        homework_status = homework["status"]
+    except KeyError as e:
+        logger.error(e)
+        raise e
 
     if homework_status not in HOMEWORK_STATUSES:
         logger.error("Получен неизвестный статус домашней работы")

@@ -1,6 +1,7 @@
 import os
 from http import HTTPStatus
 
+import pytest
 import requests
 import telegram
 import utils
@@ -446,7 +447,7 @@ class TestHomework:
 
             def valid_response_json():
                 data = {
-                    "homeworks": [{"status": "unknown"}],
+                    "homeworks": [{"status": list(self.HOMEWORK_STATUSES)[0]}],
                     "current_date": random_timestamp,
                 }
                 return data
@@ -589,6 +590,32 @@ class TestHomework:
                 "обрабатывается ситуация, при которой под ключом `homeworks` "
                 "домашки приходят не в виде списка в ответ от API."
             )
+
+    def test_get_api_anwser_response_empty(
+        self, monkeypatch, random_timestamp, current_timestamp
+    ):
+        def mock_empty_response_get(*args, **kwargs):
+            response = MockResponseGET(
+                *args,
+                random_timestamp=random_timestamp,
+                current_timestamp=current_timestamp,
+                **kwargs,
+            )
+
+            def json_invalid():
+                raise requests.exceptions.JSONDecodeError
+
+            response.json = json_invalid
+            return response
+
+        monkeypatch.setattr(requests, "get", mock_empty_response_get)
+
+        import homework
+
+        func_name = "get_api_anwser"
+
+        with pytest.raises(Exception) as excinfo:
+            homework.get_api_answer(current_timestamp)
 
     def test_check_response_empty(
         self, monkeypatch, random_timestamp, current_timestamp, api_url
