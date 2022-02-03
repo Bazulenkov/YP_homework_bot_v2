@@ -31,13 +31,7 @@ HOMEWORK_STATUSES = {
     "rejected": "Работа проверена: у ревьюера есть замечания.",
 }
 
-
-fmt = "[%(asctime)s] (%(name)s) %(levelname)s: %(message)s"
 logger = logging.getLogger(__name__)
-handler = TelegramBotHandler(TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
-handler.setFormatter(logging.Formatter(fmt))
-handler.setLevel(logging.ERROR)
-logger.addHandler(handler)
 
 
 def send_message(bot: telegram.Bot, message: str):
@@ -213,5 +207,13 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG, format=fmt)
+    fmt = "[%(asctime)s] (%(name)s) %(levelname)s: %(message)s"
+    handler = TelegramBotHandler(TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
+    handler.setFormatter(logging.Formatter(fmt))
+    handler.setLevel(logging.ERROR)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format=fmt,
+        handlers=(logging.StreamHandler(), handler),
+    )
     main()
