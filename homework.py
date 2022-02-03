@@ -17,9 +17,12 @@ load_dotenv()
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format="%(asctime)s, %(levelname)s, %(message)s, %(name)s",
+    format="[%(asctime)s] (%(name)s) %(levelname)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
+# handler = logging.StreamHandler(sys.stdout)
+# logger.addHandler(handler)
+
 
 PRACTICUM_TOKEN = os.getenv("practikum_token", "")
 TELEGRAM_TOKEN = os.getenv("telegram_token", "")
@@ -63,7 +66,7 @@ def send_message(bot: telegram.Bot, message: str):
         posted_message = bot.send_message(
             chat_id=TELEGRAM_CHAT_ID, text=message
         )
-        logger.info(f'Сообщение "{message}" отправлено в Telegram')
+        logger.info(f'Сообщение отправлено в Telegram: "{message}"')
         return posted_message
     except telegram.error.TelegramError as e:
         logger.error(e)
@@ -118,7 +121,7 @@ def check_response(response: Dict) -> List:
     """
     try:
         homeworks = response["homeworks"]
-        # response["current_date"]
+        response["current_date"]
     except KeyError as e:
         logger.error(e)
         raise e
@@ -208,15 +211,14 @@ def main():
                 message = parse_status(hw)
                 send_message(bot, message)
             current_timestamp = int(response["current_date"])
-            logger.info(f"Следующая проверка через {RETRY_TIME/60} минут")
-            time.sleep(RETRY_TIME)
 
         except Exception as error:
             error_message = f" Сбой в работе программы: {error}"
             logger.error(error_message)
             send_message(bot, error_message)
+        finally:
+            logger.info(f"Следующая проверка через {RETRY_TIME/60} минут")
             time.sleep(RETRY_TIME)
-            # continue
 
 
 if __name__ == "__main__":
