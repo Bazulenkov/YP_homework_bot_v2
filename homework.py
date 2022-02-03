@@ -11,25 +11,17 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
+from logging_handler import TelegramBotHandler
 from exceptions import HomeworkStatusException
 
 load_dotenv()
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(asctime)s] (%(name)s) %(levelname)s: %(message)s",
-)
-logger = logging.getLogger(__name__)
-# handler = logging.StreamHandler(sys.stdout)
-# logger.addHandler(handler)
-
 
 PRACTICUM_TOKEN = os.getenv("practikum_token", "")
 TELEGRAM_TOKEN = os.getenv("telegram_token", "")
 TELEGRAM_CHAT_ID = os.getenv("telegram_chat", "")
 
 RETRY_TIME = 600
-ENDPOINT = "https://practicum.yandex.ru/api/user_api/homework_statuses/"
+ENDPOINT = "https://practicum.yandex.ru/api/999/user_api/homework_statuses/"
 HEADERS = {"Authorization": f"OAuth {PRACTICUM_TOKEN}"}
 
 HOMEWORK_STATUSES = {
@@ -38,14 +30,19 @@ HOMEWORK_STATUSES = {
     "rejected": "Работа проверена: у ревьюера есть замечания.",
 }
 
+fmt = "[%(asctime)s] (%(name)s) %(levelname)s: %(message)s"
+logging.basicConfig(
+    level=logging.DEBUG,
+    format=fmt,
+)
+logger = logging.getLogger(__name__)
+# handler = logging.StreamHandler(sys.stdout)
+# logger.addHandler(handler)
 
-class TelegramBotHandler(logging.Handler):
-    def __init__(self, bot: telegram.Bot):
-        super().__init__()
-        self.bot = bot
-
-    def emit(self, record: logging.LogRecord):
-        send_message(self.bot, self.format(record))
+handler = TelegramBotHandler(TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
+handler.setFormatter(logging.Formatter(fmt))
+handler.setLevel(logging.ERROR)
+logger.addHandler(handler)
 
 
 def send_message(bot: telegram.Bot, message: str):
@@ -215,7 +212,6 @@ def main():
         except Exception as error:
             error_message = f" Сбой в работе программы: {error}"
             logger.error(error_message)
-            send_message(bot, error_message)
         finally:
             logger.info(f"Следующая проверка через {RETRY_TIME/60} минут")
             time.sleep(RETRY_TIME)

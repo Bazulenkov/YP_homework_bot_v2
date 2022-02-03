@@ -1,0 +1,5 @@
+[flake8]
+ignore =
+    D107  # Missing docstring in __init__
+
+exclude = venv/
