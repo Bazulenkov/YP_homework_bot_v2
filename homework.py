@@ -16,6 +16,7 @@ from exceptions import HomeworkStatusException
 
 load_dotenv()
 
+
 PRACTICUM_TOKEN = os.getenv("practikum_token", "")
 TELEGRAM_TOKEN = os.getenv("telegram_token", "")
 TELEGRAM_CHAT_ID = os.getenv("telegram_chat", "")
@@ -30,15 +31,9 @@ HOMEWORK_STATUSES = {
     "rejected": "Работа проверена: у ревьюера есть замечания.",
 }
 
-fmt = "[%(asctime)s] (%(name)s) %(levelname)s: %(message)s"
-logging.basicConfig(
-    level=logging.DEBUG,
-    format=fmt,
-)
-logger = logging.getLogger(__name__)
-# handler = logging.StreamHandler(sys.stdout)
-# logger.addHandler(handler)
 
+fmt = "[%(asctime)s] (%(name)s) %(levelname)s: %(message)s"
+logger = logging.getLogger(__name__)
 handler = TelegramBotHandler(TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)
 handler.setFormatter(logging.Formatter(fmt))
 handler.setLevel(logging.ERROR)
@@ -218,4 +213,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG, format=fmt)
     main()
