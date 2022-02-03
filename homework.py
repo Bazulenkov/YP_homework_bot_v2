@@ -54,7 +54,11 @@ def send_message(bot: telegram.Bot, message: str):
         :class:`telegram.error.TelegramError`
     """
     try:
-        return bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+        posted_message = bot.send_message(
+            chat_id=TELEGRAM_CHAT_ID, text=message
+        )
+        logger.info(f'Сообщение "{message}" отправлено в Telegram')
+        return posted_message
     except telegram.error.TelegramError as e:
         logger.error(e)
         raise e
@@ -197,17 +201,16 @@ def main():
             for hw in homeworks:
                 message = parse_status(hw)
                 send_message(bot, message)
-            current_timestamp = response.get("current_date", current_timestamp)
+            current_timestamp = int(response["current_date"])
+            logger.info(f"Следующая проверка через {RETRY_TIME/60} минут")
             time.sleep(RETRY_TIME)
 
         except Exception as error:
-            message = f" Сбой в работе программы: {error}"
-            logger.error(message)
-            send_message(bot, message)
+            error_message = f" Сбой в работе программы: {error}"
+            logger.error(error_message)
+            send_message(bot, error_message)
             time.sleep(RETRY_TIME)
-            continue
-        else:
-            ...
+            # continue
 
 
 if __name__ == "__main__":
