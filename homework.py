@@ -17,11 +17,11 @@ load_dotenv()
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format="%(asctime)s, %(levelname)s, %(message)s, %(name)s",
+    format="[%(asctime)s] (%(name)s) %(levelname)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
-handler = logging.StreamHandler(sys.stdout)
-logger.addHandler(handler)
+# handler = logging.StreamHandler(sys.stdout)
+# logger.addHandler(handler)
 
 
 PRACTICUM_TOKEN = os.getenv("practikum_token", "")
