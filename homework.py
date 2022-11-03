@@ -78,8 +78,7 @@ def get_api_answer(current_timestamp: int = 0) -> Dict:
         logger.error(e)
         raise e
 
-    if response.status_code != requests.codes.ok:
-        response.raise_for_status()
+    response.raise_for_status()
 
     try:
         result = response.json()
