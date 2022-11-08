@@ -66,8 +66,7 @@ def get_api_answer(current_timestamp: int = 0) -> Dict:
     из формата JSON к типам данных Python.
         Либо словарь со списком ошибок.
     """
-    timestamp = current_timestamp
-    params = {"from_date": timestamp}
+    params = {"from_date": current_timestamp}
 
     try:
         response = requests.get(url=ENDPOINT, params=params, headers=HEADERS)
