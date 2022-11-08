@@ -1,6 +1,5 @@
 """Телеграм-бот, который присылает уведомления о статусе домашней работы."""
 
-import datetime
 import logging
 import os
 import sys
@@ -99,7 +98,7 @@ def check_response(response: Dict) -> List:
     доступный в ответе API по ключу 'homeworks'.
 
     Raises:
-        Oтсутствие ожидаемых ключей в ответе API;
+        Отсутствие ожидаемых ключей в ответе API;
     """
     try:
         homeworks = response["homeworks"]
@@ -115,7 +114,7 @@ def check_response(response: Dict) -> List:
 
     if not isinstance(homeworks, list):
         raise TypeError
-    if homeworks == []:
+    if not homeworks:
         logger.debug("Новые статусы отсутствуют")
     return homeworks
 
