@@ -18,9 +18,9 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-PRACTICUM_TOKEN = os.getenv("practikum_token", "")
-TELEGRAM_TOKEN = os.getenv("telegram_token", "")
-TELEGRAM_CHAT_ID = os.getenv("telegram_chat", "")
+PRACTICUM_TOKEN = os.getenv("PRACTICUM_TOKEN", "")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT", "")
 
 RETRY_TIME = 600
 ENDPOINT = "https://practicum.yandex.ru/api/user_api/homework_statuses/"
@@ -48,9 +48,7 @@ def send_message(bot: telegram.Bot, message: str):
         :class:`telegram.error.TelegramError`
     """
     try:
-        posted_message = bot.send_message(
-            chat_id=TELEGRAM_CHAT_ID, text=message
-        )
+        posted_message = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logger.info(f'Сообщение отправлено в Telegram: "{message}"')
         return posted_message
     except telegram.error.TelegramError as e:
