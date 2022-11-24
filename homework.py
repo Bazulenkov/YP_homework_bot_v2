@@ -73,11 +73,11 @@ def get_api_answer(timestamp: int = 0) -> Dict:
     except requests.RequestException as e:
         logger.error(e)
         raise e
-    response.raise_for_status()
-    # if response.status_code != 200:
-    #     raise ConnectionError(
-    #         f"Response received not success: status_code = {response.status_code}"
-    #     )
+    # response.raise_for_status()
+    if not 200 <= response.status_code < 300:
+        raise ConnectionError(
+            f"Response received not success: status_code = {response.status_code}"
+        )
     try:
         result = response.json()
     except requests.exceptions.JSONDecodeError as e:
