@@ -4,7 +4,9 @@
 class HomeworkStatusException(Exception):
     """Неверный статус домашней работы."""
 
-    pass
+
+class ResponseCheckError(Exception):
+    """Получен ответ от API c неожидаемым форматом данных."""
 
 
 class EndpointResponseError(Exception):
@@ -20,5 +22,3 @@ class EndpointResponseError(Exception):
             f'Сообщение сервера: {self.response.get("message")}',
         )
         return message
-
-    pass

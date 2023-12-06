@@ -10,12 +10,12 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
-from exceptions import HomeworkStatusException
+from exceptions import HomeworkStatusException, EndpointResponseError, \
+    ResponseCheckError
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
-
 
 PRACTICUM_TOKEN = os.getenv("PRACTICUM_TOKEN", "")
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
@@ -48,7 +48,7 @@ def send_message(bot: telegram.Bot, message: str):
     """
     try:
         posted_message = bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-        logger.info(f'Сообщение отправлено в Telegram: "{message}"')
+        logger.debug(f'Сообщение отправлено в Telegram: "{message}"')
         return posted_message
     except telegram.error.TelegramError as e:
         logger.error(e)
@@ -72,9 +72,9 @@ def get_api_answer(timestamp: int = 0) -> Dict:
         response = requests.get(url=ENDPOINT, params=params, headers=HEADERS)
     except requests.RequestException as e:
         logger.error(e)
-        raise e
-    # response.raise_for_status()
-    if not 200 <= response.status_code < 300:
+        raise EndpointResponseError(e)
+    response.raise_for_status()
+    if not 200 <= response.status_code < 204:
         raise ConnectionError(
             f"Response received not success: status_code = {response.status_code}"
         )
@@ -106,7 +106,7 @@ def check_response(response: Dict) -> List:
         response["current_date"]
     except KeyError as e:
         logger.error(e)
-        raise e
+        raise ResponseCheckError(e)
     except TypeError as e:
         logger.error("Ответ от API пришел не в виде словаря.")
         raise e
@@ -142,7 +142,7 @@ def parse_status(homework: Dict[str, str]) -> str:
         homework_status = homework["status"]
     except KeyError as e:
         logger.error(e)
-        raise e
+        raise EndpointResponseError
 
     if homework_status not in HOMEWORK_VERDICTS:
         logger.error("Получен неизвестный статус домашней работы")
